@@ -1,0 +1,159 @@
+/* Basic styling for the donor delivery container */
+.donor-delivery-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f0f8f0; /* Light green background */
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Delivery list and item styling */
+.donor-delivery-list {
+  margin-top: 20px;
+}
+
+/* Individual delivery item */
+.donor-delivery-item {
+  background-color: #ffffff; /* White background for each item */
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+}
+
+/* Hover effect for delivery item */
+.donor-delivery-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Header section for each delivery */
+.donor-delivery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.donor-delivery-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+/* Status text styling */
+.status {
+  font-weight: bold;
+  text-transform: capitalize;
+  transition: color 0.3s ease;
+}
+
+.status-available {
+  color: #ff9900; /* Soft orange for Available */
+}
+
+.status-in-progress {
+  color: #ffcc00; /* Light yellow for In Progress */
+}
+
+.status-delivered {
+  color: #28a745; /* Green for Delivered */
+}
+
+.status-not-accepted {
+  color: #808080; /* Gray color for not accepted status */
+}
+
+/* Status completed (Delivery completed) */
+.status-completed {
+  color: #28a745;
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+}
+
+/* Info blocks for each delivery item */
+.donor-info-block {
+  margin-bottom: 10px;
+}
+
+.donor-info-block h4 {
+  font-size: 1rem;
+  color: #555;
+}
+
+.donor-info-block p {
+  color: #666;
+  margin: 5px 0;
+}
+
+/* Actions section for each delivery */
+.donor-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+  flex-direction: column; /* Stack the buttons vertically */
+}
+
+/* Button for confirming delivery */
+.confirm-delivery-button {
+  padding: 12px 20px;
+  background-color: #28a745; /* Green */
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.confirm-delivery-button:hover {
+  background-color: #218838; /* Darker green for hover */
+  transform: translateY(-2px);
+}
+
+/* General button hover effects */
+button:focus {
+  outline: none;
+}
+
+/* Status text in actions section */
+.status-in-progress {
+  font-size: 1.1rem;
+  color: #ffcc00; /* Yellow for "In Progress" status */
+}
+
+.status-not-accepted {
+  color: #808080; /* Gray for waiting */
+}
+
+.status-delivered {
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  color: #28a745; /* Green for completed delivery */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .donor-delivery-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .donor-delivery-item {
+    padding: 15px;
+  }
+
+  .donor-actions {
+    align-items: flex-start;
+  }
+
+  .confirm-delivery-button {
+    width: 100%;
+    margin-top: 10px;
+  }
+}

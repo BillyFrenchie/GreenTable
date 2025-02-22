@@ -1,0 +1,121 @@
+/* Payment.css */
+.container-p {
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.container-p:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+  font-size: 26px;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+input:focus {
+  border-color: #00d100;
+  box-shadow: 0 0 5px rgba(0, 209, 0, 0.3);
+  outline: none;
+}
+
+/* PayPal button container styling */
+#paypal-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  background-color: #f7f7f7;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease-in-out;
+}
+
+#paypal-button-container:hover {
+  background-color: #f0f0f0;
+}
+
+.pay-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pay-button {
+  background-color: #00d100;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 18px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, transform 0.2s;
+}
+
+.pay-button:hover {
+  background-color: #00b800;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px);
+}
+
+.pay-button:active {
+  transform: translateY(0);
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .container-p {
+    padding: 15px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  input {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .pay-button {
+    padding: 15px;
+    font-size: 16px;
+  }
+
+  #paypal-button-container {
+    padding: 10px;
+  }
+}

@@ -1,0 +1,411 @@
+/* Reset and Basic Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f8f8;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Container to center the content in the middle of the screen */
+
+
+/* Style for the welcome message */
+.welcome-message {
+  text-align: center;
+  padding: 30px 40px;
+  margin: 2%;
+ /* White background for the message box */
+ background-color: #00897b;
+  border-radius: 12px; /* Rounded corners for a softer look */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  width: 100%;
+  max-width: 450px; /* Limit the width for a neat design */
+  font-size: 1.6rem; /* Larger text for the welcome message */
+  color: #333333; /* Dark gray text for good readability */
+  transition: all 0.3s ease; /* Smooth transition effect for hover */
+}
+
+/* Hover effect to give interactivity */
+.welcome-message:hover {
+  transform: scale(1.05); /* Slightly enlarge the box */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+}
+
+/* Style for the "Loading..." message */
+.loading-text {
+  font-size: 1.2rem;
+  color: #777777; /* Light gray color for the loading message */
+  font-style: italic;
+  transition: color 0.3s ease; /* Smooth transition for color change */
+}
+
+/* Loading state - subtle animation */
+.loading-text::after {
+  content: "...";
+  animation: dots 1.5s steps(5, end) infinite; /* Creates the "..." animation */
+}
+
+/* Animation for the loading text */
+@keyframes dots {
+  0% { content: '.'; }
+  25% { content: '..'; }
+  50% { content: '...'; }
+  75% { content: '..'; }
+  100% { content: '.'; }
+}
+
+
+.homepage-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* Horizontal Navbar */
+.navbar {
+    width: 100%;
+    background-color: #00897b;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.navbar h2 {
+    color: white;
+    margin-left: 20px;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    margin-right: 20px;
+}
+
+.navbar ul li {
+    margin: 0 20px;
+}
+
+.navbar ul li a {
+    color: white;
+    font-size: 18px;
+    text-decoration: none;
+    padding: 10px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.navbar ul li a:hover {
+    background-color: #004d40;
+    border-radius: 5px;
+}
+
+/* Main Content Section */
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    max-width: 1000px;
+    padding: 20px;
+    background-color: #ffffff;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content h1 {
+    font-size: 36px;
+    color: #004d40;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Card Container */
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  /* Card Styling */
+  .card {
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    text-align: center;
+    width: 300px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+  
+  .card.active {
+    transform: scale(1.2);
+    width: 40%;
+    
+    z-index: 10;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .card h3 {
+    color: #00897b;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  
+  .card p {
+    font-size: 16px;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    transition: color 0.3s ease;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Limits to 3 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .card button {
+    background-color: #00897b;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+  }
+  
+  .card button:hover {
+    background-color: #005d4e;
+    transform: translateY(-2px);
+  }
+  
+  .card .go-back {
+    background-color: #f44336;
+  }
+  
+  .card .go-back:hover {
+    background-color: #c41d14;
+  }
+  
+ /* Styling for Card Images */
+.card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    position: relative; /* Position relative for overlay positioning */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+}
+
+.card img:hover {
+    transform: scale(1.05); /* Slight zoom on hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Soft shadow on hover */
+}
+
+/* Transparent Overlay on Image Hover */
+.card img::after {
+    content: ''; /* Empty content */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3); /* Transparent black overlay */
+    border-radius: 10px; /* Match border radius of the image */
+    opacity: 0; /* Initially hidden */
+    transition: opacity 0.3s ease; /* Smooth transition for opacity */
+}
+
+.card img:hover::after {
+    opacity: 1; /* Show overlay on hover */
+}
+
+/* Active card (when expanded) styling */
+.card.active p {
+    display: block;
+}
+
+  
+  /* Card Content */
+  .card .learn-more {
+    background-color: #00897b;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .card .learn-more:hover {
+    background-color: #005d4e;
+    transform: scale(1.05);
+  }
+  
+  /* Flexbox for horizontal card alignment */
+  .card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  @media (max-width: 768px) {
+    .card-container {
+      justify-content: flex-start; /* Align to the start on small screens */
+    }
+  }
+  /* Card Details Styling */
+.card .card-details {
+    font-size: 16px;
+    color: #333;
+    line-height: 1.6;
+    padding: 15px;
+    text-align: left;
+    max-height: 300px; /* Optional: Limit height for scrollable details */
+    overflow-y: auto;
+  }
+  
+  .card .card-details h4 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 15px;
+    color: #00897b;
+  }
+  
+  .card .card-details p {
+    margin: 15px 0;
+  }
+  
+  .card .card-details ul,
+  .card .card-details ol {
+    margin: 10px 0;
+    padding-left: 20px;
+  }
+  
+  .card .card-details ul li,
+  .card .card-details ol li {
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+  
+  .card .card-details ul li strong,
+  .card .card-details ol li strong {
+    font-weight: bold;
+    color: #00897b;
+  }
+  
+  .card .card-details p strong {
+    font-weight: bold;
+  }
+  
+  .card .card-details ul li::before,
+  .card .card-details ol li::before {
+    content: '•';
+    color: #00897b; /* Bullet color */
+    margin-right: 10px;
+    font-size: 18px;
+  }
+  
+
+
+
+
+  /* background-slide class for the background image */
+.background-slide {
+  position: fixed;  /* Use fixed positioning to make it occupy the entire screen */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover; /* Ensure the background covers the whole screen */
+  background-position: center;
+  opacity: 0.5;  /* Add transparent overlay effect */
+  transition: opacity 1s ease-in-out, background-image 1s ease-in-out; /* Smooth transitions for opacity and background-image */
+  z-index: -1;  /* Make sure the background is behind other content */
+}
+
+  
+
+
+
+.alert-icon {
+    color: red;
+    font-size: 0.8em;
+    margin-left: 5px;
+  }
+  
+  .alert-icon {
+    color: red; /* Change the color of the alert icon */
+    transition: color 0.5s ease-in-out; /* Smooth color transition for the bell icon */
+  }
+  
+  .pickup-tab {
+    transition: background-color 0.5s ease-in-out; /* Smooth background color transition */
+  }
+  
+  .pickup-tab.alert {
+    background-color: rgba(255, 0, 0, 0.8); /* Slightly transparent red background */
+    color: white; /* Change text color for contrast */
+    animation: pulse 1s infinite; /* Pulse animation */
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1); /* Start at original size */
+    }
+    50% {
+      transform: scale(1.1); /* Slightly enlarge the tab */
+    }
+    100% {
+      transform: scale(1); /* Return to original size */
+    }
+  }
+  
+
+/* Media Queries for Responsiveness */
+@media (max-width: 1024px) {
+    .navbar ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .navbar ul li {
+        margin: 10px 0;
+    }
+
+    .content {
+        width: 90%;
+        padding: 10px;
+    }
+
+    .content h1 {
+        font-size: 28px;
+    }
+
+    .card {
+        width: 100%;
+        margin: 10px 0;
+    }
+}

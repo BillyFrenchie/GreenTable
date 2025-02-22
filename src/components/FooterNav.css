@@ -1,0 +1,28 @@
+.footer-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    background-color: white;
+    border-top: 1px solid #ccc;
+    padding: 10px;
+  }
+  
+  button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  @media (max-width: 768px) {
+    .footer-nav {
+      flex-direction: column;
+      padding: 5px;
+    }
+  
+    button {
+      font-size: 14px;
+      padding: 5px;
+    }
+  }

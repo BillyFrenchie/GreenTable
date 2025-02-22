@@ -1,0 +1,109 @@
+/* HomePage.css */
+
+/* Container for the homepage */
+.homepage-container {
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    height: 100vh;
+  }
+  
+  /* Navbar styling */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #00d100; /* Green header similar to previous design */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+  
+  .logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+  }
+  
+  .nav-links {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-link {
+    color: white;
+    font-size: 16px;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+  }
+  
+  .nav-link:hover {
+    color: #fffb00; /* Yellow hover effect */
+  }
+  
+  /* Logout button styling */
+  .logout-button {
+    background-color: white;
+    color: #00d100;
+    border: 1px solid #00d100;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, transform 0.2s;
+  }
+  
+  .logout-button:hover {
+    background-color: #00b800;
+    color: white;
+    transform: translateY(-3px);
+  }
+  
+  .logout-button:active {
+    transform: translateY(0);
+  }
+  
+  /* Welcome section styling */
+  .welcome-section {
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  .welcome-section h2 {
+    font-size: 28px;
+    color: #333;
+  }
+  
+  .highlight {
+    color: #00d100; /* Highlighted text with the same green */
+  }
+  
+  .welcome-section p {
+    font-size: 18px;
+    color: #777;
+    margin-top: 10px;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .navbar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .nav-links {
+      margin-top: 10px;
+      flex-direction: column;
+      gap: 10px;
+    }
+  
+    .logo {
+      margin-bottom: 10px;
+    }
+  
+    .logout-button {
+      margin-top: 15px;
+      width: 100%;
+    }
+  }
+  

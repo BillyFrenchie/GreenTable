@@ -1,0 +1,69 @@
+/* OlaMaps.css */
+
+.ola-map-container {
+    width: 100%;
+    max-width: 1400px; /* Increased maximum width for better visibility */
+    margin: 0 auto; /* Center the container */
+    padding: 20px; /* Add padding around the container */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    border-radius: 8px; /* Rounded corners */
+    background-color: #ffffff; /* Background color */
+}
+
+.ola-map-container h2 {
+    text-align: center; /* Center the heading */
+    margin-bottom: 20px; /* Space below the heading */
+    font-size: 28px; /* Increased font size for better visibility */
+    color: #333; /* Text color */
+    font-weight: 600; /* Make the heading bold */
+}
+
+/* Increased height and adjusted width for better visibility */
+#map {
+    border-radius: 8px; /* Rounded corners for the map */
+    overflow: hidden; /* Ensure the map does not overflow */
+    height: 800px; /* Increased fixed height for the map */
+    width: 100%; /* Ensure the map takes full width of its container */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for the map */
+}
+
+.ola-map-container .search-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.ola-map-container .search-bar input {
+    width: 250px;
+    padding: 8px;
+    margin-right: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.ola-map-container .search-bar button {
+    padding: 8px 15px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.ola-map-container .search-bar button:hover {
+    background-color: #45a049;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #map {
+        height: 600px; /* Adjusted height for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    #map {
+        height: 450px; /* Further adjusted height for very small screens */
+    }
+}
