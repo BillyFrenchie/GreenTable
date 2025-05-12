@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 // import { io } from 'socket.io-client';
 import './Pickups.css';
-import { FaSearch, FaWeightHanging, FaConciergeBell, FaClock, FaClipboardList, FaCloudMeatball, FaFreeCodeCamp, FaDashcube, FaCookieBite, FaHome, FaTruck, FaMap, FaTractor, FaCashRegister, FaDollarSign, FaPowerOff, FaLightbulb, FaShoppingBasket, FaCartArrowDown, FaCartPlus, FaCaretSquareUp, FaShoppingCart } from 'react-icons/fa';
-
-
+import {
+  FaShoppingCart
+} from 'react-icons/fa';
 
 const Pickups = () => {
   const [pickups, setPickups] = useState([]);
@@ -13,11 +13,11 @@ const Pickups = () => {
   // const socket = io('http://localhost:3001'); // WebSocket connection to the server
 
   useEffect(() => {
-    // Fetch surplus data from the backend
     const fetchSurplusData = async () => {
       try {
         const response = await axios.get('http://localhost:3001/get-surplus');
         setPickups(response.data);
+        console.log(pickups); 
       } catch (error) {
         console.error('Error fetching surplus data:', error);
       }
@@ -25,12 +25,10 @@ const Pickups = () => {
 
     fetchSurplusData();
 
-    // Listen for 'item-accepted' event from the server
     // socket.on('item-accepted', (item) => {
     //   setPickups((prevPickups) => prevPickups.filter(pickup => pickup._id !== item._id));
     // });
 
-    // Cleanup socket connection on unmount
     // return () => {
     //   socket.disconnect();
     // };
@@ -39,12 +37,9 @@ const Pickups = () => {
   const handleAccept = async (item) => {
     try {
       const response = await axios.post(`http://localhost:3001/accept-pickup/${item._id}`);
-
       if (response.status === 200) {
         setCart((prevCart) => [...prevCart, item]);
         setPickups((prevPickups) => prevPickups.filter((pickup) => pickup._id !== item._id));
-        
-        // Emit 'accept-item' to notify other users
         // socket.emit('accept-item', item);
       }
     } catch (error) {
@@ -52,20 +47,21 @@ const Pickups = () => {
     }
   };
 
-
-
-
-  
-
-  const handleRemoveFromCart = (item) => {
-    setCart((prevCart) => prevCart.filter((cartItem) => cartItem._id !== item._id));
-    setPickups((prevPickups) => [...prevPickups, item]);
+  const handleRemoveFromCart = async (item) => {
+    try {
+      const response = await axios.post(`http://localhost:3001/reject-pickup/${item._id}`);
+      if (response.status === 200 && response.data.status === 'Available') {
+        setCart((prevCart) => prevCart.filter((cartItem) => cartItem._id !== item._id));
+        setPickups((prevPickups) => [...prevPickups, response.data]);
+      }
+    } catch (error) {
+      console.error('Error rejecting item:', error);
+    }
   };
 
   return (
     <div className="container-pi">
-    
-      <h2><FaShoppingCart/> Available Pickups</h2>
+      <h2><FaShoppingCart /> Available Pickups</h2>
       <div className="pickup-list">
         {pickups.map((item) => (
           <div className="pickup-item" key={item._id}>
@@ -85,7 +81,6 @@ const Pickups = () => {
       <button className="cart-button" onClick={() => setIsCartVisible(!isCartVisible)}>
         View your cart ({cart.length})
       </button>
-      
 
       {isCartVisible && cart.length > 0 && (
         <div className="view-cart">

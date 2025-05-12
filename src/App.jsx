@@ -17,6 +17,8 @@ import DonorDeliveryPage from './components/DonorDeliveryPage';
 import "./index.css"
 import PickupsComponent from './components/PickupsComponent';
 import DonorLocationsMap from './components/DonorLocationsMap';
+import DonationRewards from './components/DonationRewards';
+import FoodSurplusDonationLandingPage from './components/FoodSurplusDonationLandingPage';
 
 
 function App() {
@@ -30,12 +32,14 @@ function App() {
       <Route path="/register-ngo" element={<NGOSignUp/>}></Route>
       <Route path="/login" element={<NGOLogin/>}></Route>
       <Route path="/home" element={<HomePage/>}></Route>
+      <Route path="/donor-home" element={<FoodSurplusDonationLandingPage/>}></Route>
       <Route path="/list-surplus" element={<SurplusList/>}></Route>
       <Route path="/home/pickups" element={<PickupsComponent/>}></Route>
       <Route path="/home/pastorders" element={<PastOrders/>}></Route>
       <Route path="/home/maps" element={<DonorLocationsMap/>}></Route>
       <Route path="/home/delivery" element={<DeliveryPage/>}></Route>
       <Route path="/donordelivery" element={<DonorDeliveryPage/>}></Route>
+      <Route path="/rewards" element={<DonationRewards/>}></Route>
 
       <Route path="/payment" element={<Payment/>}></Route>
 

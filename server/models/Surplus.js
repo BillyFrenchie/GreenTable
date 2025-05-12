@@ -11,6 +11,11 @@ const SurplusSchema = new mongoose.Schema({
         type: String,
         default: 'Available', // Can be 'Available', 'Picked Up', 'Delivered'
     },
+    donorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Donor' // Reference to Donor model
+},
+
     deliveryDetails: {
         address: String,
         deliveredAt: Date,

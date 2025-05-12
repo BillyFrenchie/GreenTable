@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
+import Navbar from './Navbar';
 
 // Fix for Leaflet marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -52,6 +53,8 @@ const DonorLocationsMap = () => {
   const [filteredDonors, setFilteredDonors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+        const [activeLink, setActiveLink] = useState('/home/maps');
+  
 
   // Function to get user location with improved accuracy
   const getUserLocation = () => {
@@ -203,7 +206,8 @@ const DonorLocationsMap = () => {
     );
   }
 
-  return (
+  return (<>  
+  <Navbar activeLink={activeLink} setActiveLink={setActiveLink}/>
     <div className="!min-h-screen !bg-green-50 !font-sans !flex !flex-col !items-center !justify-start !py-10">
       <div className="!container !max-w-6xl !bg-white !shadow-xl !rounded-3xl !overflow-hidden !p-8 !md:p-12 !flex !flex-col !md:flex-row !gap-8">
 
@@ -213,7 +217,7 @@ const DonorLocationsMap = () => {
             Giving Food
           </h1>
           <p className="!text-gray-600 !mb-4">
-            Find local heroes donating in your community.
+            <strong> Find local heroes donating in your community.</strong>
           </p>
           {/* Search Input */}
           <div className="!mb-6">
@@ -331,6 +335,7 @@ const DonorLocationsMap = () => {
         </p>
       </footer>
     </div>
+    </>
   );
 };
 

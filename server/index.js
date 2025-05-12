@@ -7,6 +7,8 @@ const socketIo = require('socket.io');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 
+
+
 const app = express();
 const { Server } = require('socket.io');
 
@@ -35,8 +37,11 @@ const JWT_SECRET = 'greentable';
 
 // Function to generate JWT token
 function generateToken(payload) {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' }); // Expires in 1 hour
+    const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+    const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' }); // Longer expiry for refresh token
+    return { accessToken, refreshToken };
 }
+
 
 
 
@@ -147,6 +152,8 @@ const NgoModel = require('./models/Ngo')(ngoDB);
 // Connect to surplus database
 const surplusDB = mongoose.createConnection("mongodb://127.0.0.1:27017/surplus");
 const SurplusModel = require('./models/Surplus')(surplusDB);
+const CompletedOrderModel = require('../server/models/CompletedOrder')(surplusDB);
+
 
 
 
@@ -250,21 +257,35 @@ app.post('/login', (req, res) => {
 
 
 // Middleware to authenticate the token
-const authenticateToken = (req, res, next) => {
-    const token = req.cookies.loggedin_token || req.headers['authorization']?.split(' ')[1]; 
-    if (!token) {
-        return res.status(401).json({ error: "Access denied, no token provided" });
-    }
+const authenticateToken = async (req, res, next) => {
+    try {
+        const token = req.cookies.loggedin_token || req.headers['authorization']?.split(' ')[1]; 
 
-    // Verify token and decode it
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) {
-            
-            return res.status(403).json({ error: "Invalid token" });
+
+
+        if (!token) {
+            return res.status(401).json({ error: "Access denied, no token provided" });
         }
-        req.user = user; // Attach the user data to the request object
-        next(); // Proceed to the next middleware or route handler
-    });
+
+        const decoded = jwt.verify(token, JWT_SECRET);
+        
+        
+        req.user = decoded; // Attach user payload to request
+
+        // Attempt to find the donor in the database using their email (or use decoded._id if token contains it)
+        const donor = await DonorModel.findOne({ email: decoded.email });
+
+        if (donor) {
+            req.donorId = donor._id; // Attach donorId to request
+        } else {
+            req.donorId = null; // Optional: still allow processing even if no donor found
+        }
+
+        next(); // Proceed to next middleware or route
+    } catch (err) {
+        console.error("Token authentication error:", err);
+        return res.status(403).json({ error: "Invalid token or user not found" });
+    }
 };
 
 // Protect the route with authenticateToken middleware
@@ -323,13 +344,14 @@ app.post('/register-ngo', (req, res) => {
 });
 
 // List surplus and send WhatsApp notification
-app.post('/list-surplus', async (req, res) => {
+app.post('/list-surplus',authenticateToken, async (req, res) => {
     try {
         // Parse quantity and servingSize to numbers
         const surplusData = {
             ...req.body,
             quantity: (req.body.quantity),
-            servingSize: (req.body.servingSize)
+            servingSize: (req.body.servingSize),
+            donorId: req.donorId || undefined // Attach donorId if middleware found one
         };
 
         // Save the surplus item to the database
@@ -475,22 +497,29 @@ app.get('/get-delivery-status/:id', async (req, res) => {
 // Get all deliveries for a specific donor (this API should fetch donor-specific deliveries)
 app.get('/get-donor-deliveries', async (req, res) => {
     try {
-        // Retrieve the donorId from the cookie
-        const itemId = req.cookies.pickedup_item;
-        console.log('Received donorId from cookie:', itemId);  // Debug log
+        const cookies = req.cookies;
+        const itemIds = [];
 
-        if (!itemId) {
-            return res.status(400).json({ message: 'Donor ID is required in the cookie' });
+        // Extract item IDs from cookies like pickedup_item_<id>
+        for (const key in cookies) {
+            if (key.startsWith('pickedup_item_') && cookies[key] === 'accepted') {
+                const itemId = key.replace('pickedup_item_', '');
+                itemIds.push(itemId);
+            }
         }
 
-        // Fetch deliveries based on donorId
-        const deliveries = await SurplusModel.findOne({ 
-            _id: itemId, 
-            status: { $in: ['In Progress', 'Delivered','accepted'] } 
-        });        console.log('Deliveries found:', deliveries);  // Debug log
+        if (itemIds.length === 0) {
+            return res.status(400).json({ message: 'No accepted items found in cookies' });
+        }
 
-        if (deliveries.length === 0) {
-            return res.status(404).json({ message: 'No deliveries found for this donor' });
+        // Fetch all matching items
+        const deliveries = await SurplusModel.find({ 
+            _id: { $in: itemIds }, 
+            status: { $in: ['In Progress', 'Delivered', 'accepted'] } 
+        });
+
+        if (!deliveries || deliveries.length === 0) {
+            return res.status(404).json({ message: 'No deliveries found for these items' });
         }
 
         res.status(200).json(deliveries);
@@ -499,6 +528,7 @@ app.get('/get-donor-deliveries', async (req, res) => {
         res.status(500).json({ message: 'Failed to fetch donor deliveries' });
     }
 });
+    
 
 
 
@@ -536,28 +566,83 @@ app.post('/complete-delivery/:id', async (req, res) => {
 });
 
 
+
+
+
+
+
 // Endpoint to confirm delivery and delete the donor's delivery record
+// Confirm delivery and store in completed orders
 app.post('/confirm-delivery/:id', async (req, res) => {
     try {
       const { id } = req.params;
   
-      // Find and delete the item from the database
-      const deletedItem = await SurplusModel.findByIdAndDelete(id);
-  
-      if (!deletedItem) {
+      const itemToConfirm = await SurplusModel.findById(id);
+      if (!itemToConfirm) {
         return res.status(404).json({ message: 'Surplus item not found' });
       }
   
-      // Emit an event to notify other clients (optional)
+      const quantityValue = parseFloat(itemToConfirm.quantity.replace(/[^\d.-]/g, ''));
+      const quantityUnit = itemToConfirm.quantity.replace(/[\d\s.-]/g, '').trim();
+  
+      if (isNaN(quantityValue)) {
+        return res.status(400).json({ message: 'Invalid quantity value' });
+      }
+  
+      const completedOrder = new CompletedOrderModel({
+        originalId: itemToConfirm._id,
+        itemName: itemToConfirm.name,
+        quantity: {
+          amount: quantityValue,
+          unit: quantityUnit
+        },
+        deliveryDetails: itemToConfirm.deliveryDetails,
+        status: 'Delivered',
+      });
+  
+      await completedOrder.save();
+  
+      const deletedItem = await SurplusModel.findByIdAndDelete(id);
+  
       io.emit('delivery-deleted', deletedItem);
   
-      res.status(200).json({ message: 'Delivery confirmed and item deleted successfully', deletedItem });
+      res.status(200).json({
+        message: 'Delivery confirmed and item archived successfully',
+        deletedItem
+      });
+  
     } catch (error) {
       console.error('Error confirming delivery:', error);
       res.status(500).json({ message: 'Failed to confirm delivery' });
     }
   });
   
+  
+  
+  app.get('/completed-orders', async (req, res) => {
+    try {
+      // Fetch all completed orders
+      const completedOrders = await CompletedOrderModel.find()
+        .populate('originalId')  // If you want to include the related surplus item (originalId) details
+        .populate('deliveryDetails.deliveredBy')  // If you want to include the NGO details for the delivery
+        .exec();
+  
+      if (!completedOrders || completedOrders.length === 0) {
+        return res.status(404).json({ message: 'No completed orders found' });
+      }
+  
+      // Return the list of completed orders
+      res.status(200).json(completedOrders);
+    } catch (error) {
+      console.error('Error fetching completed orders:', error);
+      res.status(500).json({ message: 'Failed to fetch completed orders' });
+    }
+  });
+
+
+
+
+
   
   // Update listing
   app.put('/update-listing/:id', async (req, res) => {
@@ -579,24 +664,67 @@ app.post('/confirm-delivery/:id', async (req, res) => {
 
 
 // Get surplus data
+
+
 app.get('/get-surplus', async (req, res) => {
     try {
-        const surplusItems = await SurplusModel.find({});
-        res.json(surplusItems);
+      // Fetch all surplus items
+      const surplusItems = await SurplusModel.find({});
+  
+      // Group by donorId
+      const groupedByDonor = surplusItems.reduce((acc, item) => {
+        const donorId = item.donorId?.toString(); // handle null donorId
+        if (donorId) {
+          if (!acc[donorId]) acc[donorId] = [];
+          acc[donorId].push(item);
+        }
+        return acc;
+      }, {});
+  
+      const result = [];
+  
+      for (const donorId in groupedByDonor) {
+        const donor = await DonorModel.findById(donorId).select('firstName lastName email');
+        if (donor) {
+          // Attach donor info to each item
+          const enrichedItems = groupedByDonor[donorId].map(item => ({
+            ...item.toObject(),
+            donor: {
+              firstName: donor.firstName,
+              lastName: donor.lastName,
+              email: donor.email
+            }
+          }));
+          result.push(...enrichedItems);
+        }
+      }
+//   console.log(result);
+      res.json(result);
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'Internal Server Error' });
+      console.error("Error in GET /get-surplus:", err);
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
-});
+  });
+  
+  
+
 
 
 // Backend: active-listings endpoint (in your server file)
 
 
 // Fetch all active surplus listings
-app.get('/active-listings', async (req, res) => {
+app.get('/active-listings', authenticateToken, async (req, res) => {
     try {
-        const listings = await SurplusModel.find(); // You can add more conditions here to fetch only active listings
+        // Check if donorId is attached to the request object
+        if (!req.donorId) {
+            return res.status(401).json({ error: "Unauthorized: Donor not found" });
+        }
+
+        // Fetch only surplus items that match the donorId
+        const listings = await SurplusModel.find({ donorId: req.donorId });
+
+        // Send the matching listings
         res.json(listings);
     } catch (error) {
         console.error(error);
@@ -641,49 +769,84 @@ app.get('/get-donors', async (req, res) => {
 
 
 // Express backend example
+// Accept pickup
 app.post('/accept-pickup/:id', async (req, res) => {
     const { id } = req.params;
     try {
-      // Assuming you're using MongoDB
       const pickup = await SurplusModel.findById(id);
       if (!pickup) {
         return res.status(404).json({ error: 'Pickup not found' });
       }
   
-      // Update the pickup status to "accepted"
+      // Update status
       pickup.status = 'accepted';
       await pickup.save();
   
-      res.status(200).json(pickup); // Send back the updated pickup
+      // Set a cookie that expires in 1 day
+    //   res.cookie(`itemAccepted_${id}`, true, {
+    //     maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+    //     httpOnly: true,
+    //     sameSite: 'strict'
+    //   });
+  
+      res.status(200).json(pickup);
+      console.log(req.cookies); // shows all cookies
+
     } catch (error) {
       res.status(500).json({ error: 'Error accepting the pickup' });
     }
   });
-app.post('/reject-pickup/:id', async (req, res) => {
+  
+  // Reject pickup
+  app.post('/reject-pickup/:id', async (req, res) => {
     const { id } = req.params;
     try {
-      // Assuming you're using MongoDB
       const pickup = await SurplusModel.findById(id);
       if (!pickup) {
         return res.status(404).json({ error: 'Pickup not found' });
       }
   
-      // Update the pickup status to "accepted"
+      // Update status
       pickup.status = 'Available';
       await pickup.save();
   
-      res.status(200).json(pickup); // Send back the updated pickup
+      // Clear the cookie associated with this item
+    //   res.clearCookie(`itemAccepted_${id}`);
+  
+      res.status(200).json(pickup);
     } catch (error) {
-      res.status(500).json({ error: 'Error accepting the pickup' });
+      res.status(500).json({ error: 'Error rejecting the pickup' });
     }
   });
+
+
+  // Assuming you're already using express and SurplusModel
+app.get('/check-item-status/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const item = await SurplusModel.findById(id);
+
+        if (!item) {
+            return res.status(404).json({ error: 'Item not found' });
+        }
+
+        // Return only the status (or more info if needed)
+        res.status(200).json({ status: item.status });
+    } catch (error) {
+        console.error('Error checking item status:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+  
   
 
 
 
 
 // Start the server
-server.listen(3001, () => {
+server.listen(3001, '0.0.0.0', () => {
     console.log("Server is Running on port 3001");
-});
-
+  });
+  
